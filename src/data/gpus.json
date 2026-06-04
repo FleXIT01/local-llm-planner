@@ -1,0 +1,335 @@
+[
+  {
+    "id": "arc_b570",
+    "name": "Intel Arc B570",
+    "vram_gb": 10,
+    "price_eur": 250,
+    "tdp_watt": 150,
+    "manufacturer": "intel",
+    "notes": "Budget Intel Battlemage. 10GB GDDR6. Ollama supports Intel XPU via SYCL — best on Linux."
+  },
+  {
+    "id": "rtx4060",
+    "name": "NVIDIA RTX 4060",
+    "vram_gb": 8,
+    "price_eur": 280,
+    "tdp_watt": 115,
+    "manufacturer": "nvidia",
+    "notes": "Entry-level Ada Lovelace. 8GB fits small models up to 7B Q6. Good beginner card."
+  },
+  {
+    "id": "arc_b580",
+    "name": "Intel Arc B580",
+    "vram_gb": 12,
+    "price_eur": 285,
+    "tdp_watt": 190,
+    "manufacturer": "intel",
+    "notes": "Mid-range Intel Battlemage. 12GB GDDR6 at RTX 4060 price. SYCL/XPU backend in Ollama."
+  },
+  {
+    "id": "rtx5060",
+    "name": "NVIDIA RTX 5060",
+    "vram_gb": 8,
+    "price_eur": 315,
+    "tdp_watt": 150,
+    "manufacturer": "nvidia",
+    "notes": "Entry Blackwell. 8GB GDDR7 — same VRAM as RTX 4060 but faster memory bandwidth."
+  },
+  {
+    "id": "rx9060xt8",
+    "name": "AMD RX 9060 XT 8GB",
+    "vram_gb": 8,
+    "price_eur": 355,
+    "tdp_watt": 150,
+    "manufacturer": "amd",
+    "notes": "AMD RDNA 4 entry-level. 8GB GDDR6. ROCm support on Linux; limited on Windows."
+  },
+  {
+    "id": "rtx5060ti8",
+    "name": "NVIDIA RTX 5060 Ti 8GB",
+    "vram_gb": 8,
+    "price_eur": 420,
+    "tdp_watt": 160,
+    "manufacturer": "nvidia",
+    "notes": "Blackwell mid-range in 8GB config. Faster than RTX 4060 but same VRAM ceiling."
+  },
+  {
+    "id": "rtx4060ti16",
+    "name": "NVIDIA RTX 4060 Ti 16GB",
+    "vram_gb": 16,
+    "price_eur": 450,
+    "tdp_watt": 165,
+    "manufacturer": "nvidia",
+    "notes": "Best legacy value for 16GB Ada. Runs 14B models in Q6/Q8 comfortably."
+  },
+  {
+    "id": "rtx5060ti16",
+    "name": "NVIDIA RTX 5060 Ti 16GB",
+    "vram_gb": 16,
+    "price_eur": 460,
+    "tdp_watt": 160,
+    "manufacturer": "nvidia",
+    "notes": "Blackwell 16GB with GDDR7. Better efficiency than RTX 4060 Ti at the same VRAM."
+  },
+  {
+    "id": "rx9070",
+    "name": "AMD RX 9070",
+    "vram_gb": 16,
+    "price_eur": 480,
+    "tdp_watt": 220,
+    "manufacturer": "amd",
+    "notes": "RDNA 4 mid-range. 16GB GDDR6 with strong ROCm 6 support. Excellent Ollama value on Linux."
+  },
+  {
+    "id": "rtx4070s",
+    "name": "NVIDIA RTX 4070 Super",
+    "vram_gb": 12,
+    "price_eur": 520,
+    "tdp_watt": 220,
+    "manufacturer": "nvidia",
+    "notes": "Faster Ada with the same 12GB as the base 4070. Good for 7B Q8 and 13B Q4."
+  },
+  {
+    "id": "rtx4070",
+    "name": "NVIDIA RTX 4070",
+    "vram_gb": 12,
+    "price_eur": 550,
+    "tdp_watt": 200,
+    "manufacturer": "nvidia",
+    "notes": "Solid Ada mid-range. 12GB fits 13B Q4 and 7B Q8. Reliable all-rounder."
+  },
+  {
+    "id": "rx9060xt16",
+    "name": "AMD RX 9060 XT 16GB",
+    "vram_gb": 16,
+    "price_eur": 385,
+    "tdp_watt": 165,
+    "manufacturer": "amd",
+    "notes": "16GB RDNA 4 at entry price. Underrated for LLM inference — ROCm on Linux recommended."
+  },
+  {
+    "id": "rx9070xt",
+    "name": "AMD RX 9070 XT",
+    "vram_gb": 16,
+    "price_eur": 580,
+    "tdp_watt": 304,
+    "manufacturer": "amd",
+    "notes": "RDNA 4 upper mid-range. Competes with RTX 5070 at lower price. Best AMD value in 2025."
+  },
+  {
+    "id": "rtx3090",
+    "name": "NVIDIA RTX 3090 (used)",
+    "vram_gb": 24,
+    "price_eur": 600,
+    "tdp_watt": 350,
+    "manufacturer": "nvidia",
+    "notes": "Used market king for 24GB VRAM. Older Ampere but fully CUDA-compatible with Ollama."
+  },
+  {
+    "id": "rtx5070",
+    "name": "NVIDIA RTX 5070",
+    "vram_gb": 12,
+    "price_eur": 650,
+    "tdp_watt": 250,
+    "manufacturer": "nvidia",
+    "notes": "Blackwell mid-range. Same 12GB as RTX 4070 but with much faster GDDR7 memory bandwidth."
+  },
+  {
+    "id": "rtx4070tis",
+    "name": "NVIDIA RTX 4070 Ti Super",
+    "vram_gb": 16,
+    "price_eur": 780,
+    "tdp_watt": 285,
+    "manufacturer": "nvidia",
+    "notes": "Excellent Ada performance + 16GB. Great for 14–27B models at Q6/Q8."
+  },
+  {
+    "id": "rtx5070ti",
+    "name": "NVIDIA RTX 5070 Ti",
+    "vram_gb": 16,
+    "price_eur": 900,
+    "tdp_watt": 300,
+    "manufacturer": "nvidia",
+    "notes": "Upper Blackwell. 16GB GDDR7 with ~30% more bandwidth than RTX 4070 Ti Super."
+  },
+  {
+    "id": "rx7900xtx",
+    "name": "AMD RX 7900 XTX",
+    "vram_gb": 24,
+    "price_eur": 900,
+    "tdp_watt": 355,
+    "manufacturer": "amd",
+    "notes": "24GB RDNA 3 at a fraction of RTX 4090 price. Strong ROCm support for Ollama on Linux."
+  },
+  {
+    "id": "rtx4080s",
+    "name": "NVIDIA RTX 4080 Super",
+    "vram_gb": 16,
+    "price_eur": 1000,
+    "tdp_watt": 320,
+    "manufacturer": "nvidia",
+    "notes": "High-end Ada with 256-bit bus. Smooth 14–27B inference in Q8."
+  },
+  {
+    "id": "rtx4000ada",
+    "name": "NVIDIA RTX 4000 Ada",
+    "vram_gb": 20,
+    "price_eur": 1200,
+    "tdp_watt": 165,
+    "manufacturer": "nvidia",
+    "notes": "Workstation card with 20GB ECC VRAM. Low power, rack-friendly. Ada arch — full CUDA support."
+  },
+  {
+    "id": "rtx5080",
+    "name": "NVIDIA RTX 5080",
+    "vram_gb": 16,
+    "price_eur": 1350,
+    "tdp_watt": 360,
+    "manufacturer": "nvidia",
+    "notes": "High-end Blackwell. 16GB GDDR7 — roughly 2× the memory bandwidth of RTX 4080 Super."
+  },
+  {
+    "id": "rtx4500ada",
+    "name": "NVIDIA RTX 4500 Ada",
+    "vram_gb": 24,
+    "price_eur": 2000,
+    "tdp_watt": 210,
+    "manufacturer": "nvidia",
+    "notes": "Workstation 24GB ECC card. Low power, quiet, fits in professional systems. Full CUDA."
+  },
+  {
+    "id": "rtx4090",
+    "name": "NVIDIA RTX 4090",
+    "vram_gb": 24,
+    "price_eur": 1800,
+    "tdp_watt": 450,
+    "manufacturer": "nvidia",
+    "notes": "Fastest Ada Lovelace consumer GPU. 24GB fits Mistral 7B at FP16 or Phi-4 14B at Q8."
+  },
+  {
+    "id": "rtx5090",
+    "name": "NVIDIA RTX 5090",
+    "vram_gb": 32,
+    "price_eur": 2400,
+    "tdp_watt": 575,
+    "manufacturer": "nvidia",
+    "notes": "Flagship Blackwell. First consumer GPU with 32GB VRAM. Runs 70B models in Q4 with room."
+  },
+  {
+    "id": "dual_rtx3090",
+    "name": "2× NVIDIA RTX 3090 (used)",
+    "vram_gb": 48,
+    "price_eur": 1200,
+    "tdp_watt": 700,
+    "manufacturer": "nvidia",
+    "notes": "Multi-GPU via NVLink or tensor parallelism (llama.cpp). 48GB fits 70B in Q4 and Q8."
+  },
+  {
+    "id": "radeon_pro_w7800",
+    "name": "AMD Radeon Pro W7800",
+    "vram_gb": 32,
+    "price_eur": 2500,
+    "tdp_watt": 260,
+    "manufacturer": "amd",
+    "notes": "Workstation 32GB ECC RDNA 3. Good ROCm support. Strong value for 30B+ models vs NVIDIA workstation cards."
+  },
+  {
+    "id": "rtx5000ada",
+    "name": "NVIDIA RTX 5000 Ada",
+    "vram_gb": 32,
+    "price_eur": 3200,
+    "tdp_watt": 250,
+    "manufacturer": "nvidia",
+    "notes": "Workstation 32GB ECC Ada. Low TDP, ECC memory, certified drivers. Great for 70B Q4."
+  },
+  {
+    "id": "mac_m4_max",
+    "name": "Apple Mac M4 Max (128GB)",
+    "vram_gb": 128,
+    "price_eur": 3500,
+    "tdp_watt": 92,
+    "manufacturer": "apple",
+    "notes": "M4 Max with 128GB unified memory. ~40% faster than M3 Max. Fits 70B Q4/Q8 comfortably. macOS only."
+  },
+  {
+    "id": "radeon_pro_w7900",
+    "name": "AMD Radeon Pro W7900",
+    "vram_gb": 48,
+    "price_eur": 3800,
+    "tdp_watt": 295,
+    "manufacturer": "amd",
+    "notes": "Workstation 48GB ECC RDNA 3. Strong ROCm support, runs 70B at Q8 or larger at Q4."
+  },
+  {
+    "id": "rtx_a6000",
+    "name": "NVIDIA RTX A6000",
+    "vram_gb": 48,
+    "price_eur": 5500,
+    "tdp_watt": 300,
+    "manufacturer": "nvidia",
+    "notes": "Previous-gen Ampere workstation. 48GB ECC VRAM — widely available used. Full NVLink support."
+  },
+  {
+    "id": "mac_m3_ultra",
+    "name": "Apple Mac M3 Ultra (192GB)",
+    "vram_gb": 192,
+    "price_eur": 5000,
+    "tdp_watt": 60,
+    "manufacturer": "apple",
+    "notes": "192GB unified memory. Silent, power-efficient, runs 70B at FP16 or larger at Q4. macOS only."
+  },
+  {
+    "id": "rtx6000ada",
+    "name": "NVIDIA RTX 6000 Ada",
+    "vram_gb": 48,
+    "price_eur": 7000,
+    "tdp_watt": 300,
+    "manufacturer": "nvidia",
+    "notes": "Flagship workstation Ada. 48GB ECC VRAM, NVLink support. Runs 70B at Q8 comfortably."
+  },
+  {
+    "id": "l40s",
+    "name": "NVIDIA L40S",
+    "vram_gb": 48,
+    "price_eur": 10000,
+    "tdp_watt": 350,
+    "manufacturer": "nvidia",
+    "notes": "AI inference workstation/server. 48GB GDDR6 with Ada arch. Optimized for multi-model serving."
+  },
+  {
+    "id": "a100_40gb",
+    "name": "NVIDIA A100 40GB (used)",
+    "vram_gb": 40,
+    "price_eur": 8000,
+    "tdp_watt": 250,
+    "manufacturer": "nvidia",
+    "notes": "Data center Ampere GPU. 40GB HBM2e. Typically accessed via cloud/server. HBM gives very high bandwidth."
+  },
+  {
+    "id": "a100_80gb",
+    "name": "NVIDIA A100 80GB (server)",
+    "vram_gb": 80,
+    "price_eur": 15000,
+    "tdp_watt": 400,
+    "manufacturer": "nvidia",
+    "notes": "Data center standard. 80GB HBM2e — runs 70B at FP16 with room. Usually cloud/cluster only."
+  },
+  {
+    "id": "h100_80gb",
+    "name": "NVIDIA H100 80GB (server)",
+    "vram_gb": 80,
+    "price_eur": 25000,
+    "tdp_watt": 700,
+    "manufacturer": "nvidia",
+    "notes": "State-of-the-art data center GPU. 80GB HBM3, fastest available. Cloud/cluster only. Not for desktop."
+  },
+  {
+    "id": "mi300x",
+    "name": "AMD Instinct MI300X (server)",
+    "vram_gb": 192,
+    "price_eur": 20000,
+    "tdp_watt": 750,
+    "manufacturer": "amd",
+    "notes": "192GB HBM3 unified memory. Runs 405B models. Server/AI cluster only. ROCm 6 support is excellent."
+  }
+]

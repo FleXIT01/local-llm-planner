@@ -1,0 +1,86 @@
+[
+  {
+    "id": "student-budget",
+    "name": "Student Budget",
+    "description": "Under €300 — get started with local LLMs on a tight budget. Runs small but capable models for everyday chat and coding help.",
+    "gpu_id": "rtx4060",
+    "recommended_models": ["llama3.2-3b", "phi4-mini", "mistral-7b"],
+    "setup_notes": [
+      "RTX 4060 has 8GB VRAM — stick to models under 7B parameters or use Q4 quantization.",
+      "Mistral 7B at Q4 needs ~4.2 GB, leaving headroom for the OS and browser.",
+      "Install Ollama: https://ollama.com/download",
+      "Run your first model: ollama run phi4-mini"
+    ]
+  },
+  {
+    "id": "developer-starter",
+    "name": "Developer Starter",
+    "description": "€300–600 — 16GB VRAM unlocks 14B models in Q8 and serious coding assistants. The sweet spot for developers.",
+    "gpu_id": "rx9070",
+    "recommended_models": ["phi4", "qwen2.5-14b", "mistral-7b", "phi4-mini"],
+    "setup_notes": [
+      "RX 9070 has 16GB GDDR6 — strong ROCm 6 support on Linux, limited on Windows.",
+      "Phi-4 14B at Q6 (12.6 GB) fits with headroom — excellent coding and reasoning quality.",
+      "On Windows, CUDA GPUs (e.g. RTX 4060 Ti 16GB) may have smoother Ollama experience.",
+      "Install Ollama: https://ollama.com/download",
+      "AMD ROCm setup: https://rocm.docs.amd.com/en/latest/deploy/linux/quick_start.html"
+    ]
+  },
+  {
+    "id": "power-user",
+    "name": "Power User",
+    "description": "€600–1200 — 24GB VRAM from used/value hardware. Runs Mistral 7B at FP16 or Phi-4 14B at Q8 with full quality.",
+    "gpu_id": "rx7900xtx",
+    "recommended_models": ["gemma3-9b", "phi4", "qwen2.5-14b", "mistral-7b"],
+    "setup_notes": [
+      "RX 7900 XTX delivers 24GB VRAM for €900 — far better value than RTX 4090 for LLM use.",
+      "ROCm 6 on Linux is mature — Ollama 0.3+ supports this GPU natively.",
+      "For a CUDA alternative at similar price, the RTX 3090 (used) gives the same 24GB.",
+      "Install Ollama: https://ollama.com/download",
+      "Check GPU temps with: rocm-smi (AMD) or nvidia-smi (NVIDIA)"
+    ]
+  },
+  {
+    "id": "multi-gpu-lab",
+    "name": "Multi-GPU Lab",
+    "description": "Over €2000 — workstation-class 48GB+ VRAM for running 70B models at full quality, multi-model serving, or fine-tuning.",
+    "gpu_id": "rtx6000ada",
+    "recommended_models": ["llama3.3-70b", "deepseek-coder-v3", "qwen2.5-72b", "mixtral-8x7b"],
+    "setup_notes": [
+      "RTX 6000 Ada has 48GB ECC VRAM — runs Llama 70B at Q8 (~84 GB needed for full FP16, Q8 fits in 48GB).",
+      "For a budget multi-GPU alternative: 2× RTX 3090 (48GB NVLink) at ~€1200 total.",
+      "Use llama.cpp server for multi-GPU: --n-gpu-layers 99",
+      "Consider Unsloth or PEFT for fine-tuning on this hardware.",
+      "Install Ollama: https://ollama.com/download"
+    ]
+  },
+  {
+    "id": "mac-setup",
+    "name": "Mac Setup",
+    "description": "Apple Silicon with 128GB unified memory — silent, power-efficient, and capable of running 70B models at high quality.",
+    "gpu_id": "mac_m4_max",
+    "recommended_models": ["llama3.3-70b", "gemma3-27b", "qwen2.5-72b", "deepseek-coder-v3"],
+    "setup_notes": [
+      "M4 Max with 128GB unified memory — GPU and CPU share the same pool, so all 128GB is usable.",
+      "Llama 3.3 70B at Q4 needs ~42 GB; Q8 needs ~84 GB — both fit comfortably.",
+      "Metal backend is automatic with Ollama — no CUDA or ROCm drivers needed.",
+      "Install Ollama: https://ollama.com/download (macOS native build available)",
+      "Monitor memory: Activity Monitor → Memory tab, or: sudo powermetrics --samplers gpu_power"
+    ]
+  },
+  {
+    "id": "used-market-deal",
+    "name": "Used Market Deal",
+    "description": "Best price-to-performance with used hardware. The dual RTX 3090 NVLink setup gives 48GB VRAM for ~€1200 — unmatched value.",
+    "gpu_id": "dual_rtx3090",
+    "recommended_models": ["llama3.3-70b", "deepseek-coder-v3", "qwen2.5-72b", "mixtral-8x7b"],
+    "setup_notes": [
+      "Two RTX 3090s connected via NVLink give 48GB of shared VRAM — same as a €7000 RTX 6000 Ada.",
+      "Buy used from eBay/Kleinanzeigen: check GPU temps under load before buying.",
+      "NVLink bridge required: NVIDIA NVLink Bridge for RTX 30 series (~€50 used).",
+      "Use llama.cpp with tensor parallelism: ./llama-server --n-gpu-layers 99 -ts 1,1",
+      "Ollama multi-GPU support: set OLLAMA_NUM_GPU=2 in environment variables.",
+      "RTX 3090 single GPU (€600 used, 24GB) is also excellent if NVLink setup is too complex."
+    ]
+  }
+]

@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local LLM Planner</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79b8ff;
+      --success: #3fb950;
+      --warning: #d29922;
+      --danger: #f85149;
+      --budget-color: #3fb950;
+      --value-color: #58a6ff;
+      --overkill-color: #bc8cff;
+      --radius: 8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      padding: 20px 24px 0;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    header p {
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-size: 0.9rem;
+    }
+
+    /* Step indicator */
+    .steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 24px 16px 0;
+      width: 100%;
+      max-width: 600px;
+    }
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      flex: 1;
+      position: relative;
+    }
+    .step-item:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: calc(50% + 16px);
+      right: calc(-50% + 16px);
+      height: 2px;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    .step-item.done:not(:last-child)::after {
+      background: var(--accent);
+    }
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--surface);
+      transition: all 0.3s;
+      z-index: 1;
+    }
+    .step-item.active .step-circle {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--surface2);
+    }
+    .step-item.done .step-circle {
+      border-color: var(--success);
+      background: var(--success);
+      color: var(--bg);
+    }
+    .step-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .step-item.active .step-label { color: var(--accent); }
+    .step-item.done .step-label { color: var(--success); }
+
+    /* Main card */
+    main {
+      width: 100%;
+      max-width: 720px;
+      padding: 24px 16px 48px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+    .card .subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 24px;
+    }
+
+    /* Goal buttons */
+    .goal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .goal-btn {
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      padding: 20px 16px;
+      text-align: left;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .goal-btn:hover { border-color: var(--accent); background: #1c2230; }
+    .goal-btn.selected { border-color: var(--accent); background: #1a2540; }
+    .goal-btn .icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .goal-btn .name { font-weight: 600; font-size: 0.95rem; }
+    .goal-btn .desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
+
+    /* Budget slider */
+    .budget-display {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .budget-display span { font-size: 1rem; color: var(--text-muted); }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      height: 6px;
+      margin-bottom: 8px;
+    }
+    .budget-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* Hardware inputs */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus { border-color: var(--accent); }
+    .form-group select option { background: var(--surface2); }
+    .form-hint { color: var(--text-muted); font-size: 0.8rem; margin-top: 6px; }
+
+    /* Navigation buttons */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      gap: 12px;
+    }
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px 22px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Results */
+    .results-header {
+      margin-bottom: 20px;
+    }
+    .results-header h2 { font-size: 1.2rem; }
+    .results-header p { color: var(--text-muted); font-size: 0.875rem; margin-top: 4px; }
+
+    .tier-cards {
+      display: grid;
+      gap: 16px;
+    }
+    .tier-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .tier-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tier-badge {
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-budget { background: #1a3a20; color: var(--budget-color); }
+    .badge-best_value { background: #1a2a40; color: var(--value-color); }
+    .badge-overkill { background: #2a1a40; color: var(--overkill-color); }
+    .tier-price {
+      margin-left: auto;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tier-body { padding: 16px 18px; }
+    .info-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .info-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .info-box .label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .info-box .value { font-size: 0.95rem; font-weight: 600; }
+    .info-box .sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+    .vram-ascii-wrap {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+    .vram-ascii {
+      font-size: 0.88rem;
+      letter-spacing: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 10px;
+      white-space: nowrap;
+    }
+    .vram-ascii-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .vbar-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .vbar-green { color: var(--success); }
+    .vbar-yellow { color: var(--warning); }
+    .vbar-red { color: var(--danger); }
+
+    .warning-box {
+      background: #2a1e00;
+      border: 1px solid #6e4c00;
+      border-radius: 6px;
+      color: var(--warning);
+      font-size: 0.82rem;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+
+    .ollama-cmd {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+    .ollama-cmd code {
+      flex: 1;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.82rem;
+      color: var(--success);
+      word-break: break-all;
+    }
+    .copy-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      flex-shrink: 0;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+    details { border-top: 1px solid var(--border); }
+    details summary {
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+      padding: 10px 0 0;
+      user-select: none;
+    }
+    details summary:hover { color: var(--text); }
+    .notes-list {
+      list-style: none;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .notes-list li {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      padding-left: 16px;
+      position: relative;
+    }
+    .notes-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .share-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    /* Loading spinner */
+    .spinner-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 40px 0;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box {
+      background: #2a1014;
+      border: 1px solid var(--danger);
+      border-radius: var(--radius);
+      color: var(--danger);
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .goal-grid { grid-template-columns: 1fr; }
+      .info-row { grid-template-columns: 1fr; }
+      .card { padding: 20px 16px; }
+      .steps { gap: 0; }
+      .step-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Local LLM Planner</h1>
+    <p>Find the ideal GPU + model setup for running AI locally</p>
+  </header>
+
+  <div class="steps" id="stepIndicator"></div>
+
+  <main>
+    <div class="card" id="stepCard"></div>
+  </main>
+
+  <script>
+    const STEPS = ["Goal", "Budget", "Hardware", "Results"];
+    let state = { step: 1, goal: null, budget: 800, cpu: "", ram: 16, existingGpu: "" };
+
+    // Restore from URL hash
+    try {
+      const hash = location.hash.slice(1);
+      if (hash) {
+        const parsed = JSON.parse(atob(hash));
+        Object.assign(state, parsed);
+      }
+    } catch {}
+
+    function renderSteps() {
+      const el = document.getElementById("stepIndicator");
+      el.innerHTML = STEPS.map((label, i) => {
+        const n = i + 1;
+        const cls = n < state.step ? "done" : n === state.step ? "active" : "";
+        const inner = n < state.step ? "✓" : n;
+        return `<div class="step-item ${cls}">
+          <div class="step-circle">${inner}</div>
+          <div class="step-label">${label}</div>
+        </div>`;
+      }).join("");
+    }
+
+    const GOALS = [
+      { id: "chat",       icon: "💬", name: "Chat / Assistant", desc: "General Q&A, writing, summarization" },
+      { id: "coding",     icon: "💻", name: "Coding Assistant", desc: "Code completion, debugging, review" },
+      { id: "image_gen",  icon: "🎨", name: "Image Generation", desc: "Stable Diffusion, FLUX, ComfyUI" },
+      { id: "multimodal", icon: "🔀", name: "Multi-Modal",      desc: "Vision, audio, mixed inputs" },
+    ];
+
+    const GPU_OPTIONS = [
+      { id: "",                  label: "No GPU / Integrated" },
+      // — Intel Arc (Battlemage) —
+      { id: "arc_b570",          label: "Intel Arc B570 (10 GB)" },
+      { id: "arc_b580",          label: "Intel Arc B580 (12 GB)" },
+      // — RTX 40 series —
+      { id: "rtx4060",           label: "RTX 4060 (8 GB)" },
+      { id: "rtx4060ti16",       label: "RTX 4060 Ti (16 GB)" },
+      { id: "rtx4070s",          label: "RTX 4070 Super (12 GB)" },
+      { id: "rtx4070",           label: "RTX 4070 (12 GB)" },
+      { id: "rtx4070tis",        label: "RTX 4070 Ti Super (16 GB)" },
+      { id: "rtx4080s",          label: "RTX 4080 Super (16 GB)" },
+      { id: "rtx4090",           label: "RTX 4090 (24 GB)" },
+      // — RTX 50 series (Blackwell) —
+      { id: "rtx5060",           label: "RTX 5060 (8 GB)" },
+      { id: "rtx5060ti8",        label: "RTX 5060 Ti (8 GB)" },
+      { id: "rtx5060ti16",       label: "RTX 5060 Ti (16 GB)" },
+      { id: "rtx5070",           label: "RTX 5070 (12 GB)" },
+      { id: "rtx5070ti",         label: "RTX 5070 Ti (16 GB)" },
+      { id: "rtx5080",           label: "RTX 5080 (16 GB)" },
+      { id: "rtx5090",           label: "RTX 5090 (32 GB)" },
+      // — AMD RDNA 4 —
+      { id: "rx9060xt8",         label: "RX 9060 XT (8 GB)" },
+      { id: "rx9060xt16",        label: "RX 9060 XT (16 GB)" },
+      { id: "rx9070",            label: "RX 9070 (16 GB)" },
+      { id: "rx9070xt",          label: "RX 9070 XT (16 GB)" },
+      // — AMD RDNA 3 —
+      { id: "rx7900xtx",         label: "RX 7900 XTX (24 GB)" },
+      // — Used / Multi-GPU —
+      { id: "rtx3090",           label: "RTX 3090 used (24 GB)" },
+      { id: "dual_rtx3090",      label: "2× RTX 3090 used (48 GB)" },
+      // — NVIDIA Workstation —
+      { id: "rtx4000ada",        label: "RTX 4000 Ada (20 GB)" },
+      { id: "rtx4500ada",        label: "RTX 4500 Ada (24 GB)" },
+      { id: "rtx5000ada",        label: "RTX 5000 Ada (32 GB)" },
+      { id: "rtx_a6000",         label: "RTX A6000 (48 GB)" },
+      { id: "rtx6000ada",        label: "RTX 6000 Ada (48 GB)" },
+      // — AMD Workstation —
+      { id: "radeon_pro_w7800",  label: "Radeon Pro W7800 (32 GB)" },
+      { id: "radeon_pro_w7900",  label: "Radeon Pro W7900 (48 GB)" },
+      // — Apple Silicon —
+      { id: "mac_m4_max",        label: "Mac M4 Max (128 GB)" },
+      { id: "mac_m3_ultra",      label: "Mac M3 Ultra (192 GB)" },
+      // — Server / Data Center —
+      { id: "l40s",              label: "NVIDIA L40S (48 GB, server)" },
+      { id: "a100_40gb",         label: "NVIDIA A100 40 GB (server)" },
+      { id: "a100_80gb",         label: "NVIDIA A100 80 GB (server)" },
+      { id: "h100_80gb",         label: "NVIDIA H100 80 GB (server)" },
+      { id: "mi300x",            label: "AMD Instinct MI300X (192 GB, server)" },
+    ];
+
+    function renderStep1() {
+      return `
+        <h2>What do you want to run?</h2>
+        <p class="subtitle">Choose your primary use case. This determines the best model type.</p>
+        <div class="goal-grid">
+          ${GOALS.map(g => `
+            <button class="goal-btn ${state.goal === g.id ? 'selected' : ''}"
+                    onclick="selectGoal('${g.id}')">
+              <div class="icon">${g.icon}</div>
+              <div class="name">${g.name}</div>
+              <div class="desc">${g.desc}</div>
+            </button>`).join("")}
+        </div>
+        <div class="nav-row">
+          <span></span>
+          <button class="btn btn-primary" onclick="goNext()"
+                  ${!state.goal ? "disabled" : ""}>Next →</button>
+        </div>`;
+    }
+
+    function renderStep2() {
+      return `
+        <h2>What's your budget?</h2>
+        <p class="subtitle">Set your maximum spend for the GPU (new price).</p>
+        <div class="budget-display" id="budgetDisplay">
+          €${state.budget} <span>EUR</span>
+        </div>
+        <input type="range" min="200" max="6000" step="50" value="${state.budget}"
+               oninput="updateBudget(this.value)" />
+        <div class="budget-labels"><span>€200</span><span>€6 000</span></div>
+        <div class="nav-row">
+          <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+          <button class="btn btn-primary" onclick="goNext()">Next →</button>
+        </div>`;
+    }
+
+    function renderStep3() {
+      const ramOptions = [4, 8, 16, 32, 64, 128].map(v =>
+        `<option value="${v}" ${state.ram === v ? "selected" : ""}>${v} GB</option>`
+      ).join("");
+      const gpuOptions = GPU_OPTIONS.map(g =>
+        `<option value="${g.id}" ${state.existingGpu === g.id ? "selected" : ""}>${g.label}</option>`
+      ).join("");
+      return `
+        <h2>Your existing hardware</h2>
+        <p class="subtitle">Optional — helps tailor the recommendation to what you already have.</p>
+        <div class="form-group">
+          <label>CPU</label>
+          <input type="text" placeholder="e.g. Intel Core i7-12700K"
+                 value="${state.cpu}"
+                 oninput="state.cpu = this.value" />
+        </div>
+        <div class="form-group">
+          <label>System RAM</label>
+          <select onchange="state.ram = Number(this.value)">${ramOptions}</select>
+        </div>
+        <div class="form-group">
+          <label>Current GPU (if any)</label>
+          <select onchange="state.existingGpu = this.value">${gpuOptions}</select>
+          <div class="form-hint">Leave blank if you don't have a dedicated GPU yet.</div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+          <button class="btn btn-primary" onclick="getRecommendation()">Get Recommendation →</button>
+        </div>`;
+    }
+
+    function renderLoading() {
+      return `<div class="spinner-wrap">
+        <div class="spinner"></div>
+        <span style="color:var(--text-muted);font-size:.9rem">Calculating your ideal setup…</span>
+      </div>`;
+    }
+
+    function renderError(msg) {
+      return `<div class="error-box">
+        <strong>Something went wrong</strong><br>${msg}
+        <div class="nav-row" style="justify-content:center;margin-top:16px">
+          <button class="btn btn-secondary" onclick="goBack()">← Back</button>
+        </div>
+      </div>`;
+    }
+
+    function tierLabel(tier) {
+      return { budget: "Budget", best_value: "Best Value", overkill: "Overkill" }[tier] ?? tier;
+    }
+
+    function vbarColorClass(pct) {
+      if (pct < 80) return "vbar-green";
+      if (pct < 95) return "vbar-yellow";
+      return "vbar-red";
+    }
+
+    function renderVramBar(required_gb, total_gb) {
+      const raw = (required_gb / total_gb) * 100;
+      const pct = Math.round(raw);
+      const SLOTS = 22;
+      const filled = Math.min(Math.round(raw / 100 * SLOTS), SLOTS);
+      const empty = SLOTS - filled;
+      const bar = "=".repeat(filled) + "-".repeat(empty);
+      const cls = vbarColorClass(raw);
+      return `
+        <div>
+          <div class="vbar-label">VRAM usage</div>
+          <div class="vram-ascii-wrap">
+            <code class="vram-ascii ${cls}">[${bar}]</code>
+            <span class="vram-ascii-meta">
+              <span class="${cls}">${required_gb} GB</span> / ${total_gb} GB
+              &nbsp;<span class="${cls}">(${pct}%)</span>
+            </span>
+          </div>
+        </div>`;
+    }
+
+    function renderResults(data) {
+      const goalName = GOALS.find(g => g.id === state.goal)?.name ?? state.goal;
+      const cards = data.options.map(opt => {
+        const warn = !opt.vram_fits
+          ? `<div class="warning-box">⚠ VRAM warning: this model needs ~${opt.vram_required_gb} GB but the GPU only has ${opt.gpu.vram_gb} GB. Performance will be limited.</div>`
+          : "";
+        const notes = opt.setup_notes.map(n => `<li>${n}</li>`).join("");
+        return `
+          <div class="tier-card">
+            <div class="tier-header">
+              <span class="tier-badge badge-${opt.tier}">${tierLabel(opt.tier)}</span>
+              <span style="color:var(--text-muted);font-size:.85rem">${opt.gpu.manufacturer.toUpperCase()}</span>
+              <span class="tier-price">€${opt.gpu.price_eur.toLocaleString()}</span>
+            </div>
+            <div class="tier-body">
+              <div class="info-row">
+                <div class="info-box">
+                  <div class="label">GPU</div>
+                  <div class="value">${opt.gpu.name}</div>
+                  <div class="sub">${opt.gpu.vram_gb} GB VRAM · ${opt.gpu.tdp_watt} W</div>
+                </div>
+                <div class="info-box">
+                  <div class="label">Model</div>
+                  <div class="value">${opt.model.name}</div>
+                  <div class="sub">${opt.quantization.toUpperCase()} · ctx ${(opt.model.context_length / 1000).toFixed(0)}K</div>
+                </div>
+              </div>
+
+              ${renderVramBar(opt.vram_required_gb, opt.gpu.vram_gb)}
+
+              ${warn}
+
+              <div class="ollama-cmd">
+                <code id="cmd-${opt.tier}">${opt.ollama_command}</code>
+                <button class="copy-btn" onclick="copyCmd('${opt.tier}', this)">Copy</button>
+              </div>
+
+              <details>
+                <summary>Setup notes (${opt.setup_notes.length})</summary>
+                <ul class="notes-list">${notes}</ul>
+              </details>
+            </div>
+          </div>`;
+      }).join("");
+
+      return `
+        <div class="results-header">
+          <h2>Your recommendations</h2>
+          <p>For <strong>${goalName}</strong> · Budget up to <strong>€${state.budget.toLocaleString()}</strong></p>
+        </div>
+        <div class="tier-cards">${cards}</div>
+        <div class="share-row">
+          <button class="btn btn-secondary" onclick="shareUrl()">🔗 Share this config</button>
+          &nbsp;
+          <button class="btn btn-secondary" onclick="restart()">↺ Start over</button>
+        </div>`;
+    }
+
+    function render() {
+      renderSteps();
+      const card = document.getElementById("stepCard");
+      if (state.step === 1) card.innerHTML = renderStep1();
+      else if (state.step === 2) card.innerHTML = renderStep2();
+      else if (state.step === 3) card.innerHTML = renderStep3();
+    }
+
+    function selectGoal(id) {
+      state.goal = id;
+      render();
+    }
+
+    function updateBudget(val) {
+      state.budget = Number(val);
+      document.getElementById("budgetDisplay").innerHTML = `€${state.budget} <span>EUR</span>`;
+    }
+
+    function goNext() {
+      if (state.step < 3) { state.step++; render(); }
+    }
+    function goBack() {
+      if (state.step > 1) { state.step--; render(); }
+    }
+    function restart() {
+      state = { step: 1, goal: null, budget: 800, cpu: "", ram: 16, existingGpu: "" };
+      history.replaceState(null, "", location.pathname);
+      render();
+    }
+
+    async function getRecommendation() {
+      const card = document.getElementById("stepCard");
+      card.innerHTML = renderLoading();
+      renderSteps();
+
+      try {
+        const res = await fetch("/api/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            goal: state.goal,
+            budget_eur: state.budget,
+            existing_cpu: state.cpu || undefined,
+            existing_ram_gb: state.ram,
+            existing_gpu_id: state.existingGpu || undefined,
+          }),
+        });
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+        const data = await res.json();
+        state.step = 4;
+        renderSteps();
+        card.innerHTML = renderResults(data);
+      } catch (err) {
+        card.innerHTML = renderError(err.message);
+      }
+    }
+
+    function copyCmd(tier, btn) {
+      const text = document.getElementById(`cmd-${tier}`).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+      });
+    }
+
+    function shareUrl() {
+      const payload = btoa(JSON.stringify({
+        goal: state.goal,
+        budget: state.budget,
+        cpu: state.cpu,
+        ram: state.ram,
+        existingGpu: state.existingGpu,
+      }));
+      const url = `${location.origin}${location.pathname}#${payload}`;
+      navigator.clipboard.writeText(url).then(() => alert("Link copied to clipboard!"));
+    }
+
+    // Initial render
+    if (state.goal && state.step === 1) state.step = 1;
+    render();
+    // Auto-fetch results if hash had full config
+    if (state.goal && state.step >= 4) {
+      getRecommendation();
+    }
+  </script>
+</body>
+</html>

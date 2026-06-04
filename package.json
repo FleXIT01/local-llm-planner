@@ -1,0 +1,30 @@
+{
+  "name": "local-llm-planner",
+  "version": "0.1.0",
+  "description": "Web wizard that recommends local LLM hardware setups based on goals, budget, and existing hardware.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "biome check src/",
+    "format": "biome format --write src/"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.7.10"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": ["llm", "hardware", "ai", "local", "developer-tools"],
+  "license": "MIT"
+}

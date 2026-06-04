@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment & secrets — never commit these
+.env
+.env.local
+.env.*.local
+.envrc
+*.secret
+secrets.json
+credentials.json
+auth.json
+config.local.json
+
+# Private keys / certificates
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# npm / package manager
+.npmrc
+.yarnrc
+.pnpmfile.cjs
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# TypeScript
+*.tsbuildinfo
+
+# Python (run.py launcher)
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Temp / testing artefacts
+tmp/
+temp/
+coverage/
+.nyc_output/
+
+# Backup / merge leftovers
+*.bak
+*.orig
+*.rej
