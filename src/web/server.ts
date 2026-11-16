@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import { advisorRoute } from "./routes/advisor.js";
 import { presetsRoute } from "./routes/presets.js";
 
@@ -12,7 +11,6 @@ const HTML = readFileSync(resolve(__dir, "public/index.html"), "utf-8");
 
 export function createApp(): Hono {
   const app = new Hono();
-  app.use("*", cors());
 
   app.get("/", (c) => c.html(HTML));
   app.route("/api/recommend", advisorRoute());

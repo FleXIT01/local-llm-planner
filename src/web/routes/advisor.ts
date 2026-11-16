@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { HardwareAdvisor } from "../../advisor/HardwareAdvisor.js";
-import type { UserInput } from "../../types/index.js";
+import type { UseCase, UserInput } from "../../types/index.js";
 
-const advisor = new HardwareAdvisor();
+const USE_CASES: readonly UseCase[] = ["chat", "coding", "image_gen", "multimodal"];
 
 export function advisorRoute(): Hono {
   const app = new Hono();
+  const advisor = new HardwareAdvisor();
 
   app.post("/", async (c) => {
     let body: UserInput;
@@ -15,8 +16,16 @@ export function advisorRoute(): Hono {
       return c.json({ error: "Invalid JSON body" }, 400);
     }
 
-    if (!body.goal || body.budget_eur == null) {
-      return c.json({ error: "goal and budget_eur are required" }, 400);
+    if (!body.goal || !USE_CASES.includes(body.goal)) {
+      return c.json({ error: `goal is required and must be one of: ${USE_CASES.join(", ")}` }, 400);
+    }
+
+    if (
+      typeof body.budget_eur !== "number" ||
+      !Number.isFinite(body.budget_eur) ||
+      body.budget_eur < 0
+    ) {
+      return c.json({ error: "budget_eur must be a non-negative finite number" }, 400);
     }
 
     const recommendation = advisor.recommend(body);
