@@ -35,6 +35,18 @@ npm install
 npm run dev       # http://localhost:3000
 ```
 
+**Production (compiled):**
+```bash
+npm run build     # tsc -> dist/ + copies runtime assets
+node dist/index.js
+```
+
+## Validation
+
+`POST /api/recommend` rejects invalid input with a 400 error:
+- `goal` must be one of `chat`, `coding`, `image_gen`, `multimodal`
+- `budget_eur` must be a non-negative finite number
+
 ## API
 
 | Method | Path | Description |
@@ -142,7 +154,7 @@ python run.py all      # install + test + build + start
 
 # npm directly
 npm run dev       # tsx dev server, hot reload
-npm run build     # tsc -> dist/
+npm run build     # tsc -> dist/ + copy runtime assets (presets.json, public/)
 npm test          # vitest unit tests
 npm run lint      # biome check src/
 npm run format    # biome format --write src/
@@ -152,6 +164,8 @@ npm run format    # biome format --write src/
 
 ```
 run.py                          # Python launcher (start / test / build)
+scripts/
+└── copy-assets.mjs             # copies presets.json + public/ into dist/ (post-build)
 src/
 ├── types/index.ts              # GPU, LLMModel, UserInput, Recommendation, Preset
 ├── data/
@@ -170,8 +184,11 @@ src/
 │   └── public/index.html       # single-file Vanilla JS wizard SPA
 └── index.ts
 tests/
-└── vramCalculator.test.ts      # 12 unit tests
+├── vramCalculator.test.ts       # 12 unit tests
+└── hardwareAdvisor.test.ts      # 5 tests for the 3-tier recommendation engine
 ```
+
+Run everything with `python run.py test` or `npm test` (17 tests total).
 
 ## License
 
